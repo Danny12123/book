@@ -1,20 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import tw from "twrnc";
+import { StatusBar } from "expo-status-bar";
+import { persister, store } from "./src/store/store";
+import { Provider, useSelector } from "react-redux";
+import { useLoadedAssets } from "./hooks/useLoadedAssets";
+import { useColorScheme } from "react-native";
+import { PersistGate } from "redux-persist/integration/react";
+import Navigation from "./navigation";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const colorScheme = useColorScheme();
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  const isLoadingComplete = useLoadedAssets();
+
+  if (!isLoadingComplete) {
+    return null;
+  } else {
+    return (
+      <Provider store={store}>
+        <PersistGate persistor={persister}>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </PersistGate>
+      </Provider>
+    );
+  }
+}
